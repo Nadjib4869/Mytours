@@ -6,6 +6,10 @@ This project is a RESTful API for a tours website. It was built using Node.js, E
 
 Upcomming...
 
-## Objective : writing a documentation like this for this project
+## Objective :
+
+### Hosting the API on Heroku
+
+### writing a documentation like this for this project
 
 There is also an API at `/api`, with [documentation available here](https://documenter.getpostman.com/view/4237486/S1LwxnaE?version=latest).

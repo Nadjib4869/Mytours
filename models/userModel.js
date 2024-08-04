@@ -34,16 +34,22 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: [true, "Please confirm your password"],
     validate: {
-      //! This only works on Create and SAVE!!
+      //! This only works on Create and SAVE!!!
       validator: function(val) {
         return val === this.password; //? passwordConfirm must be equal to password
+        //! Here if we used it with "findByIdAndUpdate" it won't work because it didn't save yet "this.password", so it can't use it to compare
       },
       message: "Passwords are not the same"
     }
   },
   passwordChangedAt: Date,
   passwordResetString: String,
-  passwordResetExpires: Date
+  passwordResetExpires: Date,
+  active: {
+    type: Boolean,
+    default: true,
+    select: false
+  }
 });
 
 //? document middleware
@@ -56,6 +62,21 @@ userSchema.pre("save", async function(next) {
 
   //* delete the passwordConfirm field
   this.passwordConfirm = undefined;
+  next();
+});
+
+userSchema.pre("save", function(next) {
+  if (!this.isModified("password") || this.isNew) return next();
+
+  this.passwordChangedAt = Date.now() - 1000; //? to ensure that passwordChangedAt < token time
+  next();
+});
+
+//? query middleware
+//? using regular expressions to apply for all query that starts with "find": "find", "findAndUpdate"...
+userSchema.pre(/^find/, function(next) {
+  //* this points to the current query
+  this.find({ active: { $ne: false } });
   next();
 });
 
@@ -89,7 +110,7 @@ userSchema.methods.createPasswordResetString = function() {
 
   console.log({ resetString }, this.passwordResetString);
 
-  this.passwordResetExpires = Date.now() * 10 * 60 * 1000; // 10 min
+  this.passwordResetExpires = Date.now() + 10 * 60 * 1000; // 10 min converted to ms
 
   return resetString;
 };
