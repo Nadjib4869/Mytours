@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const slugify = require("slugify");
+//? const User = require("./userModel");
 //? const validator = require("validator");
 
 const tourSchema = new mongoose.Schema(
@@ -83,7 +84,40 @@ const tourSchema = new mongoose.Schema(
     secretTour: {
       type: Boolean,
       default: false
-    }
+    },
+    startLocation: {
+      //? GeoJSON - embedded object
+      type: {
+        type: String,
+        default: "Point",
+        enum: ["Point"]
+      },
+      coordinates: [Number], //? long, lat =|= lat, long (maps)
+      address: String,
+      description: String
+    },
+    locations: [
+      //? embedded objects
+      {
+        //? GeoJSON - embedded obj
+        type: {
+          type: String,
+          default: "Point",
+          enum: ["Point"]
+        },
+        coordinates: [Number], //? long, lat =|= lat, long (maps)
+        address: String,
+        description: String,
+        day: Number
+      }
+    ],
+    guides: [
+      //? child reference to another model (User)
+      {
+        type: mongoose.Schema.ObjectId,
+        ref: "User"
+      }
+    ]
   },
   {
     //? Schema Options
@@ -98,6 +132,13 @@ tourSchema.virtual("durationWeeks").get(function() {
   return this.duration / 7; //? "this" here refers to the current doc
 });
 
+//? Virtual Populate
+tourSchema.virtual("reviews", {
+  ref: "Review", //? ref in this model
+  foreignField: "tour", //? ref in the ref model (review)
+  localField: "_id" //? in this model
+});
+
 //? Types of Middlewares in Mongoose :
 //? 1) Document: runs before/after (a certain doc is created) these hooks: .save() and .create()
 //* pre: modify the doc before it's creation in the db | post: modify the doc after it's creation in the db
@@ -106,6 +147,14 @@ tourSchema.pre("save", function(next) {
   this.slug = slugify(this.name, { lower: true });
   next();
 });
+
+//? In case we wanna embed the relationship between tours & guides (guides: Array)
+// tourSchema.pre("save", async function(next) {
+//   //? Array of promises
+//   const guidesPromises = this.guides.map(async id => await User.findById(id));
+//   this.guides = await Promise.all(guidesPromises);
+//   next();
+// });
 
 // tourSchema.pre("save", function(next) {
 //   console.log("Will save doc ...");
@@ -125,6 +174,18 @@ tourSchema.pre(/^find/, function(next) {
   this.find({ secretTour: { $ne: true } }); //? to get only regular tours
 
   this.start = Date.now();
+  next();
+});
+
+//? Populate the ref field (guides)
+tourSchema.pre(/^find/, function(next) {
+  //? Populate: replace the field we referenced with the actual related data
+  //? (The result will look like the embedded one - although it is in a completely different collection)
+  this.populate({
+    path: "guides",
+    select: "-__v -passwordChangedAt"
+  });
+
   next();
 });
 

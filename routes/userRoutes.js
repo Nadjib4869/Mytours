@@ -4,20 +4,22 @@ const authController = require("./../controllers/authController");
 
 const router = express.Router();
 
+//? Public Routes
 router.post("/signup", authController.signUp);
 router.post("/login", authController.logIn);
-
 router.post("/forgotPassword", authController.forgotPassword);
 router.patch("/resetPassword/:string", authController.resetPassword);
 
-router.patch(
-  "/updateMyPassword",
-  authController.protect,
-  authController.updatePassword
-);
+//? Protected Routes : All routes after this middleware are protected
+router.use(authController.protect);
 
-router.patch("/updateMe", authController.protect, userController.updateMe);
-router.delete("/deleteMe", authController.protect, userController.deleteMe);
+router.patch("/updateMyPassword", authController.updatePassword);
+router.get("/me", userController.getMe, userController.getUser);
+router.patch("/updateMe", userController.updateMe);
+router.delete("/deleteMe", userController.deleteMe);
+
+//? Restricted Routes : All routes after this middleware are restricted to admin
+router.use(authController.restrictTo("admin"));
 
 router
   .route("/")

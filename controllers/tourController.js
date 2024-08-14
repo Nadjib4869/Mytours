@@ -1,7 +1,6 @@
 const Tour = require("../models/tourModel");
-const APIFeatures = require("../utils/apiFeatures");
 const catchAsync = require("../utils/catchAsync");
-const AppError = require("../utils/appError");
+const factory = require("./handlerFactory");
 
 //! Middlewares
 exports.aliasTopTours = (req, res, next) => {
@@ -12,92 +11,11 @@ exports.aliasTopTours = (req, res, next) => {
 };
 
 //! ROUTE HANDLERS
-exports.getAllTours = catchAsync(async (req, res, next) => {
-  //? EXECUTE QUERY
-  const features = new APIFeatures(Tour.find(), req.query)
-    .filter()
-    .sort()
-    .limitFields()
-    .paginate();
-  const tours = await features.query;
-
-  //? SEND RESPONSE
-  res.status(200).json({
-    //? Jsend
-    status: "success",
-    results: tours.length,
-    data: {
-      tours
-    }
-  });
-});
-
-exports.getTour = catchAsync(async (req, res, next) => {
-  //? you can add an optional param x at the end (/:x?)
-  const tour = await Tour.findById(req.params.id); //* instead of Tour.findOne({ _id: req.params.id })
-
-  //! if (Id is valid but no tour found for it) tour == null == false
-  if (!tour) {
-    return next(new AppError("No tour found with that ID", 404));
-  }
-
-  res.status(200).json({
-    status: "success",
-    data: {
-      tour
-    }
-  });
-});
-
-exports.createTour = catchAsync(async (req, res, next) => {
-  // create a doc then calling the save method on the new doc
-  // const newTour = new Tour({}); //* Here newTour is Tour.prototype (instance of Tour model)
-  // newTour.save();
-
-  // calling the create method directly on the Tour model
-  const newTour = await Tour.create(req.body);
-
-  res.status(201).json({
-    status: "success",
-    data: {
-      tour: newTour //? to send the newly created obj as a respond (Classic thing we doing a post)
-    }
-  });
-});
-
-exports.updateTour = catchAsync(async (req, res, next) => {
-  const tour = await Tour.findByIdAndUpdate(req.params.id, req.body, {
-    //* options
-    new: true, //? to return the updated doc
-    runValidators: true //? to run the validators again
-  });
-
-  //! if (Id is valid but no tour found for it) tour == null == false
-  if (!tour) {
-    return next(new AppError("No tour found with that ID", 404));
-  }
-
-  res.status(200).json({
-    status: "success",
-    data: {
-      tour
-    }
-  });
-});
-
-exports.deleteTour = catchAsync(async (req, res, next) => {
-  const tour = await Tour.findByIdAndDelete(req.params.id);
-
-  //! if (Id is valid but no tour found for it) tour == null == false
-  if (!tour) {
-    return next(new AppError("No tour found with that ID", 404));
-  }
-
-  res.status(204).json({
-    status: "success",
-    data: null
-  });
-});
+exports.getAllTours = factory.getAll(Tour);
+exports.getTour = factory.getOne(Tour, { path: "reviews" });
+exports.createTour = factory.createOne(Tour);
+exports.updateTour = factory.updateOne(Tour);
+exports.deleteTour = factory.deleteOne(Tour);
 
 exports.getTourStats = catchAsync(async (req, res, next) => {
   const stats = await Tour.aggregate([
