@@ -37,7 +37,8 @@ const tourSchema = new mongoose.Schema(
       type: Number,
       default: 4.5,
       min: [1, "Rating must be above 1.0"],
-      max: [5, "Rating must be below 5.0"]
+      max: [5, "Rating must be below 5.0"],
+      set: val => Math.round(val * 10) / 10 //? 4.666| 46.66| 47| 4.7
     },
     ratingsQuantity: {
       type: Number,
@@ -126,6 +127,11 @@ const tourSchema = new mongoose.Schema(
   }
 );
 
+//? Indexes (uses resources-space) : to improve the performance of the queries (read performance like: searching, sorting, filtering...)
+tourSchema.index({ price: 1, ratingsAverage: -1 }); //? Compound index, 1 for ascending, -1 for descending
+tourSchema.index({ slug: 1 });
+tourSchema.index({ startLocation: "2dsphere" }); //? Geospatial index
+
 //? Virtual properties : fields are not persistent in the db (can be derived from another field - so no need to save it too)
 tourSchema.virtual("durationWeeks").get(function() {
   //? here we used a regular function instead of an arrow one, cuz in arrow we don't have the "this" keyword
@@ -196,12 +202,12 @@ tourSchema.post(/^find/, function(docs, next) {
 
 //? 3) Aggregate
 //* A middleware for aggregations (stats)
-tourSchema.pre("aggregate", function(next) {
-  this.pipeline().unshift({ $match: { $ne: true } }); //? to add a match stage at the beginning of the aggregation array
+// tourSchema.pre("aggregate", function(next) {
+//   this.pipeline().unshift({ $match: { $ne: true } }); //? to add a match stage at the beginning of the aggregation array
 
-  console.log(this.pipeline());
-  next();
-});
+//   console.log(this.pipeline());
+//   next();
+// });
 
 //? 4) Model
 ///////////////////////////////////

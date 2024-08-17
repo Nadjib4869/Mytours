@@ -36,6 +36,16 @@ router
     tourController.getMonthlyPlan
   );
 
+//? Using query string : /tours-within?distance=233&center=35.37000514889885,-119.01085177568844&unit=mi
+//? Using query params (our case) : /tours-within/233/center/35.37000514889885,-119.01085177568844/unit/mi
+router
+  .route("/tours-within/:distance/center/:latlng/unit/:unit")
+  .get(tourController.getToursWithin);
+
+//? calculate distance between user location and start location
+//? /distances/35.37000514889885,-119.01085177568844/unit/mi
+router.route("/distances/:latlng/unit/:unit").get(tourController.getDistances);
+
 router
   .route("/")
   .get(tourController.getAllTours)

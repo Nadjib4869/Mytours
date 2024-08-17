@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const Tour = require("./tourModel");
 
 const reviewSchema = new mongoose.Schema(
   {
@@ -35,6 +36,9 @@ const reviewSchema = new mongoose.Schema(
   }
 );
 
+//? Unique Compound Index to prevent duplicate reviews
+reviewSchema.index({ tour: 1, user: 1 }, { unique: true });
+
 //? Populate the ref fields (user-tour)
 reviewSchema.pre(/^find/, function(next) {
   //? Populate: replace the field we referenced with the actual related data
@@ -59,6 +63,58 @@ reviewSchema.pre(/^find/, function(next) {
   });
 
   next();
+});
+
+//? static method to calculate the average rating of a tour
+reviewSchema.statics.calcAverageRatings = async function(tourId) {
+  //? this points to the model
+  const stats = await this.aggregate([
+    {
+      $match: { tour: tourId }
+    },
+    {
+      $group: {
+        _id: "$tour",
+        nRating: { $sum: 1 },
+        avgRating: { $avg: "$rating" }
+      }
+    }
+  ]);
+
+  //? update the tour with the new values
+  if (stats.length > 0) {
+    await Tour.findByIdAndUpdate(tourId, {
+      ratingsQuantity: stats[0].nRating,
+      ratingsAverage: stats[0].avgRating
+    });
+  } else {
+    //? if there are no reviews
+    await Tour.findByIdAndUpdate(tourId, {
+      ratingsQuantity: 0,
+      ratingsAverage: 4.5
+    });
+  }
+};
+
+//? Middleware to calculate the average rating after saving a review
+reviewSchema.post("save", function() {
+  //? this points to the current review
+  //? this.constructor points to the model == this.Review
+  this.constructor.calcAverageRatings(this.tour);
+});
+
+//? Middlewares to calculate the average rating after updating or deleting a review
+reviewSchema.pre(/^findOneAnd/, async function(next) {
+  //? this.findOne() will return the current document
+  //? store it the current query variable this.r (to use it in the post middleware)
+  this.r = await this.findOne();
+  next();
+});
+
+reviewSchema.post(/^findOneAnd/, async function() {
+  //? await this.findOne(); does NOT work here, cuz query is already executed
+  //? And we can't do this in the pre middleware because we need the document to be saved
+  await this.r.constructor.calcAverageRatings(this.tour);
 });
 
 //? define model variable from schema
