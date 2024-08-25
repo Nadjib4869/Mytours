@@ -4,12 +4,26 @@ This project is a RESTful API for a tours website. It was built using Node.js, E
 
 ## Features :
 
-Upcomming...
+Mapbox API for geocoding
+Stripe API for payments
+Sendgrid API for emails
+JWT for authentication
+Bcrypt for password hashing
+Mongoose for data modeling
+Multer for file uploads
+Sharp for image resizing
+Helmet for security
+Express Rate Limit for rate limiting
+CORS for cross-origin resource sharing
+HPP for HTTP parameter pollution
+XSS for cross-site scripting
+Express Mongo Sanitize for NoSQL query injection
+
 
 ## Objective :
 
 ### Hosting the API on Heroku
 
-### writing a documentation like this for this project
+## Documentation :
 
-There is also an API at `/api`, with [documentation available here](https://documenter.getpostman.com/view/4237486/S1LwxnaE?version=latest).
+There is also an API at `/api`, with [documentation available here](https://documenter.getpostman.com/view/33493267/2sA3s9D8ac).

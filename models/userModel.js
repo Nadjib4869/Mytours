@@ -17,7 +17,8 @@ const userSchema = new mongoose.Schema({
   },
   photo: {
     //? here we will store the name of the image in the file system (not the image itself)
-    type: String
+    type: String,
+    default: "default.jpg"
   },
   role: {
     type: String,
