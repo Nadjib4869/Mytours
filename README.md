@@ -1,6 +1,6 @@
-# RESTful API for a tours website
+# Tours web App (RESTful API + Pug Template Engine)
 
-This project is a RESTful API for a tours website. It was built using Node.js, Express, MongoDB, and Mongoose. The API allows users to create, read, update, and delete tours, users, and reviews. It also allows users to sign up, log in, and log out.
+This project is a tours web app. It was built using Node.js, Express, MongoDB, Mongoose and Pug. The API allows users to create, read, update, and delete tours, users, and reviews. It also allows users to sign up, log in, and log out.
 
 ## Features :
 
@@ -22,8 +22,9 @@ Express Mongo Sanitize for NoSQL query injection
 
 ## Objective :
 
-### Hosting the API on Heroku
+### Deploying the APP to Heroku
+### Use Chargily for payments instead of Stripe
 
-## Documentation :
+## API Documentation :
 
 There is also an API at `/api`, with [documentation available here](https://documenter.getpostman.com/view/33493267/2sA3s9D8ac).
