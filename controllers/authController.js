@@ -196,7 +196,7 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
     user.passwordResetExpires = undefined;
     await user.save({ validateBeforeSave: false }); //? to save data + to deactivate all validators we specified in our schema (required fields) - because we didn't input(email) all required fields(email, password)
 
-    console.log(err);
+    //console.log(err);
     return next(
       new AppError(
         "There was an error sending the email. try again later!",

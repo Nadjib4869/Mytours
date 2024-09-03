@@ -1,6 +1,6 @@
 # Tours web App (RESTful API + Pug Template Engine)
 
-This project is a tours web app. It was built using Node.js, Express, MongoDB, Mongoose and Pug. The API allows users to create, read, update, and delete tours, users, and reviews. It also allows users to sign up, log in, and log out.
+This project is a tours web app. It was built using Node.js, Express, MongoDB, Mongoose and Pug. The API allows users to create, read, update, and delete tours, users, reviews and bookings. It also allows users to sign up, log in, and log out.
 
 ## Features :
 
