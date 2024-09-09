@@ -8,6 +8,7 @@ const xss = require("xss-clean");
 const hpp = require("hpp");
 const cookieParser = require("cookie-parser");
 const compression = require("compression");
+const cors = require("cors");
 
 const AppError = require("./utils/appError");
 const globalErrorHandler = require("./controllers/errorController");
@@ -22,7 +23,15 @@ const app = express();
 app.set("view engine", "pug");
 app.set("views", path.join(__dirname, "views"));
 
-//* 1) MIDDLEWARES
+//* 1) Global MIDDLEWARES
+//? Implement CORS
+app.use(cors()); //* Allow all origins by setting Access-Control-Allow-Origin: *
+//* In case we want to allow only some origins (for ex: only our website : mytours.com to our api : api.mytours.com)
+//* we can pass a string to app.use(cors({origin: "https://www.natours.com"}))
+
+app.options("*", cors()); //* Preflight phase (before the actual req) to check if the actual req is allowed
+//* app.options("/api/v1/tours/:id", cors()) Allow only req this route
+
 //? Serving static files
 app.use(express.static(path.join(__dirname, "public")));
 
@@ -91,7 +100,7 @@ app.use((req, res, next) => {
   next();
 });
 
-//* 3) ROUTES
+//* 2) ROUTES
 app.use("/", viewRouter);
 app.use("/api/v1/tours", tourRouter);
 app.use("/api/v1/users", userRouter);

@@ -40,6 +40,15 @@ process.on("unhandledRejection", err => {
   });
 });
 
+//! Render restarts the server every 24 hours
+//? So we need to handle SIGTERM signal
+process.on("SIGTERM", () => {
+  console.log("📢 SIGTERM RECEIVED. Shutting down gracefully");
+  server.close(() => {
+    console.log("💥 Process terminated!");
+  });
+});
+
 //! MongoDB :
 //? 1. MongoDB is a NoSQL database program, which uses JSON-like (BSON) documents with optional schemas.
 //? 2. Cluster is a collection of databases on a single server.
