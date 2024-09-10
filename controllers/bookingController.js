@@ -18,7 +18,7 @@ exports.getCheckoutSession = catchAsync(async (req, res, next) => {
     // success_url: `${req.protocol}://${req.get("host")}/my-tours/?tour=${
     //   req.params.tourId
     // }&user=${req.user.id}&price=${tour.price}`, //? redirect to page after success (Secret Link) with all vars we need to create a booking
-    success_url: `${req.protocol}://${req.get("host")}/my-tours`,
+    success_url: `${req.protocol}://${req.get("host")}/my-bookings`,
     cancel_url: `${req.protocol}://${req.get("host")}/tour/${tour.slug}`, //? redirect to tour page after cancel (Public Link)
     customer_email: req.user.email,
     client_reference_id: req.params.tourId, //? last step (work only with deployed websites)
