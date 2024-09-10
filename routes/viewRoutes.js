@@ -4,6 +4,8 @@ const authController = require("../controllers/authController");
 
 const router = express.Router();
 
+router.use(viewsController.alerts);
+
 router.get(
   "/",
   //bookingController.createBookingCheckout, //? after this middleware is done it will redirect to root without the query string, so it goes next directly (cuz the query string isn't defined this time)

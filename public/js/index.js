@@ -8,6 +8,7 @@ import { signup } from "./signup";
 import { displayMap } from "./mapbox";
 import { updateSettings } from "./updateSettings";
 import { bookTour } from "./stripe";
+import { showAlert } from "./alerts";
 
 // DOM ELEMENTS
 const mapbox = document.getElementById("map");
@@ -17,6 +18,7 @@ const logOutBtn = document.querySelector(".nav__el--logout");
 const userDataForm = document.querySelector(".form-user-data");
 const userPasswordForm = document.querySelector(".form-user-password");
 const bookBtn = document.getElementById("book-tour");
+const alertMessage = document.querySelector("body").dataset.alert;
 
 // DELEGATION
 if (mapbox) {
@@ -80,9 +82,11 @@ if (userPasswordForm) {
 
 if (bookBtn) {
   bookBtn.addEventListener("click", e => {
-    e.target.textContent = "Processing..."
+    e.target.textContent = "Processing...";
     //const tourId = e.target.tourId; supposed to be e.target.tour-id but in js the "-" is omitted and "converted to CamelCase notation
     const { tourId } = e.target.dataset;
     bookTour(tourId);
   });
 }
+
+if (alertMessage) showAlert("success", alertMessage, 20);
