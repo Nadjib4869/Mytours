@@ -1,13 +1,12 @@
 const express = require("express");
 const viewsController = require("../controllers/viewsController");
 const authController = require("../controllers/authController");
-const bookingController = require("../controllers/bookingController");
 
 const router = express.Router();
 
 router.get(
   "/",
-  bookingController.createBookingCheckout, //? after this middleware is done it will redirect to root without the query string, so it goes next directly (cuz the query string isn't defined this time)
+  //bookingController.createBookingCheckout, //? after this middleware is done it will redirect to root without the query string, so it goes next directly (cuz the query string isn't defined this time)
   authController.isLoggedIn,
   viewsController.getOverview
 );
