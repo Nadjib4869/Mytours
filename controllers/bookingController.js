@@ -68,11 +68,18 @@ exports.getCheckoutSession = catchAsync(async (req, res, next) => {
 // });
 
 const createBookingCheckout = async session => {
-  const tour = session.client_reference_id;
-  const user = (await User.findOne({ email: session.customer_email })).id;
-  const price = session.line_items[0].price_data.unit_amount / 100;
+  try {
+    const tour = session.client_reference_id;
+    const user = (await User.findOne({ email: session.customer_email })).id;
+    const price = session.amount_total / 100;
 
-  await Booking.create({ tour, user, price });
+    console.log("Creating booking with:", { tour, user, price });
+
+    const booking = await Booking.create({ tour, user, price });
+    console.log("Booking created:", booking);
+  } catch (err) {
+    console.error("Error creating booking:", err);
+  }
 };
 
 exports.webhookCheckout = (req, res, next) => {
@@ -86,8 +93,11 @@ exports.webhookCheckout = (req, res, next) => {
       process.env.STRIPE_WEBHOOK_SECRET
     );
   } catch (err) {
+    console.error("Webhook signature verification failed:", err.message);
     return res.status(400).send(`Webhook error: ${err.message}`);
   }
+
+  console.log("Webhook received, event type:", event.type);
 
   if (event.type === "checkout.session.completed")
     createBookingCheckout(event.data.object);
