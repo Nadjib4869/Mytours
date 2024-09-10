@@ -19,7 +19,11 @@ const bookingRouter = require("./routes/bookingRoutes");
 const bookingController = require("./controllers/bookingController");
 const viewRouter = require("./routes/viewRoutes");
 
+//? Start Express App
 const app = express();
+
+//? Trusting proxies (for render)
+app.enable("trust proxy");
 
 app.set("view engine", "pug");
 app.set("views", path.join(__dirname, "views"));
